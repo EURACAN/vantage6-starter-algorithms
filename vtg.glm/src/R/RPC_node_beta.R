@@ -18,91 +18,104 @@
 #'
 #' @return GLM partials
 #'
-RPC_node_beta <- function( #nolint
+RPC_node_beta <- function(
+    # nolint
     data,
-    subset_rules,
     formula,
     family,
     first_iteration,
     coeff,
     dstar = NULL,
     types = NULL,
-    weights = NULL,
-    extend_data = TRUE) {
+    weights = NULL) {
+  vtg::log$debug("Initializing node beta...")
 
-    vtg::log$debug("Initializing node beta...")
+  # Specify data types for the columns in the data
+  if (!is.null(types)) {
+    data <- vtg.glm::assign_types(data, types)
+  }
 
-    # Specify data types for the columns in the data
-    if (!is.null(types)) {
-      data <- vtg.glm::assign_types(data, types)
-    }
-    if (extend_data) {
-      data <- vtg.preprocessing::extend_data(data)
-    }
-    data <- tryCatch(
-      vtg.preprocessing::subset_data(data, subset_rules),
-      error = function(e) {
-        return(vtg::error_format(conditionMessage(e)))
-      }
-    )
+  # Extract y and X variables name from formula
+  y <- eval(formula[[2]], envir = data)
+  X <- model.matrix(formula, data = data) # nolint
+  # print(X)
 
-    # Extract y and X variables name from formula
-    y <- eval(formula[[2]], envir = data)
-    X <- model.matrix(formula, data = data) #nolint
+  # Extract the offset from formula (if exists)
+  offset <- model.offset(model.frame(formula, data = data))
 
-    # Extract the offset from formula (if exists)
-    offset <- model.offset(model.frame(formula, data = data))
+  # Get the family required (Gaussian, Poisson, logistic,...)
+  dstar <- if (family == "rs.poi") eval(as.name(dstar), data) else dstar
+  family <- vtg.glm::get_family(family, dstar)
 
-    # Get the family required (Gaussian, Poisson, logistic,...)
-    dstar <- if (family == "rs.poi") eval(as.name(dstar), data) else dstar
-    family <- vtg.glm::get_family(family, dstar)
+  weights <- if (is.null(weights)) (rep.int(1, nrow(X))) else weights
+  offset <- if (is.null(offset)) rep.int(0, nrow(X)) else offset
 
-    weights <- if (is.null(weights)) (rep.int(1, nrow(X))) else weights
-    offset <- if (is.null(offset)) rep.int(0, nrow(X)) else offset
+  # (!) `nobs` and `nvars` needed by the initialize expression below
+  nobs <- nrow(X)
+  nvars <- ncol(X)
 
-    # (!) `nobs` and `nvars` needed by the initialize expression below
-    nobs <- nrow(X)
-    nvars <- ncol(X)
+  if (first_iteration) {
+    vtg::log$debug("First iteration. Initializing variables.")
 
-    if (first_iteration) {
-        vtg::log$debug("First iteration. Initializing variables.")
-
-        # Initializes n and fitted values mustart
-        if (family$family == "rs.poi") {
-            mustart <- pmax(y, dstar) + 0.1
-        } else {
-            # we need to set `etastart` which is used when evaluating
-            # the expression from `family$initialize`
-            etastart = NULL # nolint
-            eval(family$initialize)
-        }
-        # Initialize eta
-        eta <- family$linkfun(mustart)
+    # Initializes n and fitted values mustart
+    if (family$family == "rs.poi") {
+      mustart <- pmax(y, dstar) + 0.1
     } else {
-        eta <- (X %*% coeff) + offset
+      # we need to set `etastart` which is used when evaluating
+      # the expression from `family$initialize`
+      etastart <- NULL # nolint
+      eval(family$initialize)
     }
+    # Initialize eta
+    eta <- family$linkfun(mustart)
+  } else {
+    eta <- (X %*% coeff) + offset
+  }
+  # print("eta")
+  # print(eta)
+  #
+  vtg::log$debug("Calculating the Betas.")
+  mu <- family$linkinv(eta)
+  # print("mu")
+  # print(mu)
+  varg <- family$variance(mu)
+  # print("varg")
+  # print(varg)
 
-    vtg::log$debug("Calculating the Betas.")
-    mu <-  family$linkinv(eta)
-    varg <- family$variance(mu)
-    gprime <- family$mu.eta(eta)
+  gprime <- family$mu.eta(eta)
+  # print("gprime")
+  # print(gprime)
 
-    # Calculate z
-    z <- (eta - offset) + (y - mu) / gprime
-    # Update the weights
-    W <- weights * as.vector(gprime^2 / varg) #nolint
-    # Calculate the dispersion matrix
-    dispersion <- sum(W * ((y - mu) / family$mu.eta(eta))^2)
+  # Calculate z
+  z <- (eta - offset) + (y - mu) / gprime
+  # print("z")
+  # print(z)
+  # Update the weights
+  W <- weights * as.vector(gprime^2 / varg) # nolint
+  # print("W")
+  # print(W)
+  # Calculate the dispersion matrix
+  dispersion <- sum(W * ((y - mu) / family$mu.eta(eta))^2)
+  # print("dispersion")
+  # print(dispersion)
 
-    output <- list(
-        v1 = crossprod(X, W * X),
-        v2 = crossprod(X, W * z),
-        dispersion = dispersion,
-        nobs = nobs,
-        nvars = nvars,
-        wt1 = sum(weights * y),
-        wt2 = sum(weights)
-    )
+  # print("X")
+  # print(X)
+  # print("XW")
+  # print(X * W)
+  # print("XTX")
+  # print(crossprod(X, W * X))
+  # exit(0)
 
-    return(output)
+  output <- list(
+    v1 = crossprod(X, W * X),
+    v2 = crossprod(X, W * z),
+    dispersion = dispersion,
+    nobs = nobs,
+    nvars = nvars,
+    wt1 = sum(weights * y),
+    wt2 = sum(weights)
+  )
+
+  return(output)
 }

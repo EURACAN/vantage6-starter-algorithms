@@ -20,10 +20,14 @@
 #' @author van Gestel, A.
 #'
 dglm <- function(client, formula, dstar = NULL, types = NULL, family = gaussian,
-                 tol = 1e-08, maxit = 25, organizations_to_include = NULL,
-                 subset_rules = NULL, extend_data = TRUE) {
+                 tol = 1e-08, maxit = 25) {
   vtg::log$debug("Initializing...")
   lgr::threshold("debug")
+
+  # Parse a string to formula type. If it already is a formula this statement
+  # will do nothing. This is needed when Python (or other langauges) is used
+  # as a client.
+  formula <- as.formula(formula)
 
   # Run in a MASTER container. Note that this will call this method but then
   # within a Docker container. The client used here below has set the
@@ -39,23 +43,11 @@ dglm <- function(client, formula, dstar = NULL, types = NULL, family = gaussian,
       types = types,
       family = family,
       tol = tol,
-      maxit = maxit,
-      organizations_to_include = organizations_to_include,
-      subset_rules = subset_rules,
-      extend_data = extend_data
+      maxit = maxit
     )
 
     return(result)
   }
-
-  # Update the client organizations according to those specified
-  client$setOrganizations(organizations_to_include)
-
-  # Parse a string to formula type. If it already is a formula this statement
-  # will do nothing. This is needed when Python (or other langauges) is used
-  # as a client.
-  formula <- as.formula(formula)
-
 
   # initialization variables
   coeff <- NULL
@@ -76,16 +68,15 @@ dglm <- function(client, formula, dstar = NULL, types = NULL, family = gaussian,
     vtg::log$info("{iter}.1 - RPC Node Beta")
     beta_partials <- client$call(
       "node_beta",
-      subset_rules = subset_rules,
       formula = formula,
       family = family,
       first_iteration = (iter == 0),
       dstar = dstar,
       coeff = coeff,
-      types = types,
-      extend_data = extend_data
+      types = types
     )
     vtg::log$debug("  - [DONE]")
+    print(beta_partials)
 
     #######################################################################
     # CENTRAL - COMPUTE BETAS
@@ -113,7 +104,6 @@ dglm <- function(client, formula, dstar = NULL, types = NULL, family = gaussian,
     vtg::log$info("{iter}.3 - RPC Node Deviance")
     deviance_partials <- client$call(
       "node_deviance",
-      subset_rules = subset_rules,
       formula = formula,
       family = family,
       first_iteration = (iter == 0),
@@ -121,8 +111,7 @@ dglm <- function(client, formula, dstar = NULL, types = NULL, family = gaussian,
       coeff = coeff,
       coeff_old = coeff_old,
       wtdmu = beta$wtdmu,
-      types = types,
-      extend_data = extend_data
+      types = types
     )
     vtg::log$debug("  - [DONE]")
 

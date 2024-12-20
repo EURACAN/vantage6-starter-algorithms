@@ -9,7 +9,6 @@ d1 <- read.csv("C:/Users/bbe2101.54580/data/vantage6/glm/a.csv")
 d2 <- read.csv("C:/Users/bbe2101.54580/data/vantage6/glm/b.csv")
 d3 <- read.csv("C:/Users/bbe2101.54580/data/vantage6/glm/c.csv")
 dataset <- list(d1, d2, d3)
-# dataset <- list(d1)
 
 formula <- "num_awards ~ prog + math"
 

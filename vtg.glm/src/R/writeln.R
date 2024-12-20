@@ -5,7 +5,6 @@
 #' @export
 #' @examples
 #' writeln("Hello, world!")
-writeln <- function(..., sep=" ") {
-    cat(paste(paste(..., collapse=sep), "\n"))
+writeln <- function(..., sep = " ") {
+  cat(paste(paste(..., collapse = sep), "\n"))
 }
-
