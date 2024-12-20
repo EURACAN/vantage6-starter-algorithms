@@ -40,9 +40,12 @@ subset_data <- function(data, subset_rules) {
 
   require(dplyr)
 
+
   for (n_rule in seq_len(nrow(subset_rules))) {
     query <- subset_rules[n_rule, "subset"]
+    print(glue::glue("Applying subset rule: {query}"))
     result <- result %>% filter(!!rlang::parse_expr(query))
+    print(glue::glue("Number of rows after subset rule {n_rule}:", nrow(result)))
   }
 
   # subset rules are given and subsetted data is < N
@@ -60,6 +63,6 @@ subset_data <- function(data, subset_rules) {
 }
 
 get_threshold <- function() {
-  threshold <- Sys.getenv("VTG_PREPROCESS_MIN_RECORDS_THRESHOLD", unset = 3)
+  threshold <- Sys.getenv("VTG_PREPROCESS_MIN_RECORDS_THRESHOLD", unset = 1)
   return(as.integer(threshold))
 }
