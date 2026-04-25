@@ -1,7 +1,7 @@
 # The Dockerfile tells Docker how to construct the image with your algorithm.
 # Once pushed to a repository, images can be downloaded and executed by the
 # network hubs.
-FROM harbor2.vantage6.ai/base/custom-r-base
+FROM ghcr.io/starter-algorithm-base:latest
 
 # This is a placeholder that should be overloaded by invoking
 # docker build with '--build-arg PKG_NAME=...'
@@ -19,7 +19,8 @@ RUN Rscript -e 'install.packages("/usr/local/R/vtg.preprocessing", \
 COPY ./${PKG_NAME}/src /usr/local/R/${PKG_NAME}/
 
 WORKDIR /usr/local/R/${PKG_NAME}
-RUN Rscript -e 'library(devtools)' -e 'install_deps(".")'
+# RUN Rscript -e 'library(devtools)' -e 'install_deps(".")'
+RUN Rscript -e 'library(devtools)' -e 'pak::local_install_deps(".")'
 RUN R CMD INSTALL --no-multiarch --with-keep.source .
 
 # Change directory to '/app’ and create files that will be

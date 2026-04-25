@@ -1,6 +1,6 @@
 PKG_NAME ?= vtg.chisq
-HOST ?= harbor2.vantage6.ai
-IMAGE ?= starter/${PKG_NAME}
+HOST ?= ghcr.io
+IMAGE ?= starter-${PKG_NAME}
 TAG ?= dev
 
 help:
@@ -43,34 +43,30 @@ build-all:
 	make coxph
 	make crosstab
 	make glm
-	make debugger
 
 base:
 	make docker-build PKG_NAME=algorithm-base
 
 chisq:
-	make docker PKG_NAME=vtg.chisq
+	make docker-build PKG_NAME=vtg.chisq
 
 survdiff:
-	make docker PKG_NAME=vtg.survdiff
+	make docker-build PKG_NAME=vtg.survdiff
 
 survfit:
-	make docker PKG_NAME=vtg.survfit
+	make docker-build PKG_NAME=vtg.survfit
 
 summary:
-	make docker PKG_NAME=vtg.summary
+	make docker-build PKG_NAME=vtg.summary
 
 coxph:
-	make docker PKG_NAME=vtg.coxph
+	make docker-build PKG_NAME=vtg.coxph
 
 crosstab:
-	make docker PKG_NAME=vtg.crosstab
+	make docker-build PKG_NAME=vtg.crosstab
 
 glm:
-	make docker PKG_NAME=vtg.glm
-
-debugger:
-	make docker PKG_NAME=vtg.debugger
+	make docker-build PKG_NAME=vtg.glm
 
 build: install-deps document
 	@echo "*** Building \"$(PKG_NAME)\" ***"

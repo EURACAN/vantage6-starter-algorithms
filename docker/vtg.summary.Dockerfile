@@ -1,7 +1,7 @@
 # The Dockerfile tells Docker how to construct the image with your algorithm.
 # Once pushed to a repository, images can be downloaded and executed by the
 # network hubs.
-FROM harbor2.vantage6.ai/base/custom-r-base
+FROM ghcr.io/starter-algorithm-base:latest
 
 # This is a placeholder that should be overloaded by invoking
 # docker build with '--build-arg PKG_NAME=...'
@@ -25,8 +25,9 @@ WORKDIR /usr/local/R/${PKG_NAME}
 RUN R -e "remove.packages('prettyunits')"
 RUN R -e "install.packages('prettyunits', repos='http://cran.rstudio.com/')"
 
-RUN Rscript -e 'library(devtools)' -e 'install_github("IKNL/vtg")'
-RUN Rscript -e 'devtools::install_deps(".")'
+RUN Rscript -e 'library(devtools)' -e 'pak::pak("iknl/vtg")'
+# RUN Rscript -e 'devtools::install_deps(".")'
+RUN Rscript -e 'library(devtools)' -e 'pak::local_install_deps(".")'
 RUN Rscript -e 'install.packages(".", repos = NULL, type = "source", INSTALL_opts = "--no-multiarch")'
 
 # Change directory to '/app’ and create files that will be

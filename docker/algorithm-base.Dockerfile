@@ -19,9 +19,20 @@ RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/* \
     > /etc/apt/apt.conf.d/99snapshot \
   && apt-get -o Acquire::Check-Valid-Until=false update \
   && apt-get install -y --no-install-recommends \
+    pkg-config \
     libssl-dev \
     libcurl4-openssl-dev \
     libxml2-dev \
+    libfontconfig1-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
+    libwebp-dev \
+    libgit2-dev \
+    libuv1-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Change directory to '/app’. This means the subsequent ‘RUN’ steps will

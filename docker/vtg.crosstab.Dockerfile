@@ -1,7 +1,7 @@
 # The Dockerfile tells Docker how to construct the image with your algorithm.
 # Once pushed to a repository, images can be downloaded and executed by the
 # network hubs.
-FROM harbor2.vantage6.ai/base/custom-r-base
+FROM ghcr.io/starter-algorithm-base:latest
 
 # This is a placeholder that should be overloaded by invoking
 # docker build with '--build-arg PKG_NAME=...'
@@ -18,14 +18,15 @@ RUN Rscript -e 'install.packages("/usr/local/R/vtg.preprocessing", \
 RUN R -e "remove.packages('prettyunits')"
 RUN R -e "install.packages('prettyunits', repos='http://cran.rstudio.com/')"
 
-RUN Rscript -e 'library(devtools)' -e 'install_github("IKNL/vtg")'
+RUN Rscript -e 'library(devtools)' -e 'pak::pak("iknl/vtg")'
 RUN Rscript -e 'install.packages("RCurl", repos = "http://cran.rstudio.com/")'
 
 COPY ./${PKG_NAME}/src/DESCRIPTION /usr/local/R/${PKG_NAME}/DESCRIPTION
 
 WORKDIR /usr/local/R/${PKG_NAME}
 # Somehow prettyunit crashes when installed using the `install_deps`
-RUN Rscript -e 'devtools::install_deps(".", dependencies = TRUE)'
+# RUN Rscript -e 'devtools::install_deps(".", dependencies = TRUE)'
+RUN Rscript -e 'library(devtools)' -e 'pak::local_install_deps(".")'
 
 # Install federated survfit package
 COPY ./${PKG_NAME}/src /usr/local/R/${PKG_NAME}/
