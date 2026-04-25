@@ -35,6 +35,19 @@ echo:
 	@echo "         tag: ${TAG}"
 	@echo ""
 
+build-all:
+	make chisq
+	make survdiff
+	make survfit
+	make summary
+	make coxph
+	make crosstab
+	make glm
+	make debugger
+
+base:
+	make docker-build PKG_NAME=algorithm-base
+
 chisq:
 	make docker PKG_NAME=vtg.chisq
 
