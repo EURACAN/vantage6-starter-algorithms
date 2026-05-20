@@ -39,7 +39,7 @@ jobs:
           uses: docker/build-push-action@v7
           with:
             push: true
-            file: ./docker/$ALGORITHM.Dockerfile
-            tags: 
-              - euracan/starter-$ALGORITHM:latest
-              - euracan/starter-$ALGORITHM:$VERSION
+            file: ./docker/${{ env.ALGORITHM }}.Dockerfile
+            tags: |
+              euracan/starter-${{ env.ALGORITHM }}:latest
+              euracan/starter-${{ env.ALGORITHM }}:${{ env.VERSION }}
