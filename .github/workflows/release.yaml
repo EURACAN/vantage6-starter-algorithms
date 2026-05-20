@@ -35,11 +35,11 @@ jobs:
             password: ${{ secrets.GITHUB_TOKEN }}
 
         -
-        name: Build and push
-        uses: docker/build-push-action@v7
-        with:
-          push: true
-          file: ./docker/$ALGORITHM.Dockerfile
-          tags: 
-            - euracan/starter-$ALGORITHM:latest
-            - euracan/starter-$ALGORITHM:$VERSION
+          name: Build and push
+          uses: docker/build-push-action@v7
+          with:
+            push: true
+            file: ./docker/$ALGORITHM.Dockerfile
+            tags: 
+              - euracan/starter-$ALGORITHM:latest
+              - euracan/starter-$ALGORITHM:$VERSION
