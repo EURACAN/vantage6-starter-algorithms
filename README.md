@@ -1,28 +1,18 @@
-# v6-euracan-algorithms
+# Vantage6 Euracan Legacy Algorithms
+
+Home to the source of the following images:
+
+- `ghcr.io/euracan/starter-algorithm-base`
+- `ghcr.io/euracan/starter-chisq`
+- `ghcr.io/euracan/starter-summary`
+- `ghcr.io/euracan/starter-coxph`
+- `ghcr.io/euracan/starter-crosstab`
+- `ghcr.io/euracan/starter-glm`
+- `ghcr.io/euracan/starter-survdiff`
+- `ghcr.io/euracan/starter-survfit`
 
 ## Disclosure Settings
 `VTG_PREPROCESS_MIN_RECORDS_THRESHOLD`
-
-## Building Image
-
-Development build
-```bash
-make docker PKG_NAME=vtg.chisq
-```
-
-Release build (should only be triggered by CI, see release section below)
-```bash
-make docker PKG_NAME=vtg.chisq TAG=x.x.x
-```
-
-You can also use the specialized make rules for building the image, for example:
-```bash
-make chisq
-```
-to build a development image for the `vtg.chisq` package. Or you can build a release image with (should only be triggered by CI, see release section below):
-```bash
-make chisq TAG=x.x.x
-```
 
 ## Release
 To make a release you need to tag the commit with the algorithm and version number, for example:
@@ -40,6 +30,7 @@ With `[ALGORITHM]` being the name of the algorithm:
 - `survdiff`
 - `coxph`
 - `crosstab`
+- `glm`
 
 ## Documentation
 
