@@ -44,5 +44,5 @@ jobs:
             push: true
             file: ./docker/${{ env.ALGORITHM }}.Dockerfile
             tags: |
-              euracan/starter-${{ env.ALGORITHM }}:latest
-              euracan/starter-${{ env.ALGORITHM }}:${{ env.VERSION }}
+              ghcr.io/euracan/starter-${{ env.ALGORITHM }}:latest
+              ghcr.io/euracan/starter-${{ env.ALGORITHM }}:${{ env.VERSION }}
