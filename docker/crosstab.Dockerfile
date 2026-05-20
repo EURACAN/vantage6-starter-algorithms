@@ -1,13 +1,14 @@
 # The Dockerfile tells Docker how to construct the image with your algorithm.
 # Once pushed to a repository, images can be downloaded and executed by the
 # network hubs.
-FROM ghcr.io/starter-algorithm-base:latest
+FROM docker.io/s102099/start-algorithm-base
 
 # This is a placeholder that should be overloaded by invoking
 # docker build with '--build-arg PKG_NAME=...'
-ARG PKG_NAME='vtg.survfit'
+ARG PKG_NAME='vtg.crosstab'
 
 LABEL maintainer="Hasan Alradhi <h.alradhi@iknl.nl>"
+LABEL maintainer="Frank Martin <f.martin@iknl.nl>"
 
 # Install common functions package
 COPY ./vtg.preprocessing/ /usr/local/R/vtg.preprocessing/
@@ -42,4 +43,3 @@ RUN touch database
 # Tell docker to execute `docker.wrapper()` when the image is run.
 ENV PKG_NAME=${PKG_NAME}
 CMD Rscript -e "vtg::docker.wrapper('$PKG_NAME')"
-

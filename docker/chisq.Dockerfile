@@ -1,12 +1,13 @@
 # The Dockerfile tells Docker how to construct the image with your algorithm.
 # Once pushed to a repository, images can be downloaded and executed by the
 # network hubs.
-FROM ghcr.io/starter-algorithm-base:latest
+FROM docker.io/s102099/start-algorithm-base
 
 # This is a placeholder that should be overloaded by invoking
 # docker build with '--build-arg PKG_NAME=...'
-ARG PKG_NAME='vtg.glm'
+ARG PKG_NAME='vtg.chisq'
 
+LABEL maintainer="Hasan Alradhi <h.alradhi@iknl.nl>"
 LABEL maintainer="Frank Martin <f.martin@iknl.nl>"
 
 # Install common functions package
@@ -17,14 +18,10 @@ RUN Rscript -e 'install.packages("/usr/local/R/vtg.preprocessing", \
 # Install federated chisq package
 COPY ./${PKG_NAME}/src /usr/local/R/${PKG_NAME}/
 
-
 WORKDIR /usr/local/R/${PKG_NAME}
 # RUN Rscript -e 'library(devtools)' -e 'install_deps(".")'
 RUN Rscript -e 'library(devtools)' -e 'pak::local_install_deps(".")'
 RUN R CMD INSTALL --no-multiarch --with-keep.source .
-# RUN Rscript -e 'library(devtools)' -e 'pak::pak("iknl/vtg")'
-# RUN Rscript -e 'devtools::install_deps(".")'
-# RUN Rscript -e 'install.packages(".", repos = NULL, type = "source", INSTALL_opts = "--no-multiarch")'
 
 # Change directory to '/app’ and create files that will be
 # used to mount input, output and database.

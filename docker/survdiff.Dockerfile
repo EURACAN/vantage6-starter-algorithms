@@ -1,31 +1,25 @@
 # The Dockerfile tells Docker how to construct the image with your algorithm.
 # Once pushed to a repository, images can be downloaded and executed by the
 # network hubs.
-FROM ghcr.io/starter-algorithm-base:latest
+FROM docker.io/s102099/start-algorithm-base
 
 # This is a placeholder that should be overloaded by invoking
 # docker build with '--build-arg PKG_NAME=...'
-ARG PKG_NAME='vtg.summary'
+ARG PKG_NAME='vtg.survdiff'
 
 LABEL maintainer="Hasan Alradhi <h.alradhi@iknl.nl>"
-LABEL maintainer="Frank Martin <f.martin@iknl.nl>"
-LABEL maintainer="Bart van Beusekom <b.vanbeusekom@iknl.nl>"
 
 # Install common functions package
 COPY ./vtg.preprocessing/ /usr/local/R/vtg.preprocessing/
 RUN Rscript -e 'install.packages("/usr/local/R/vtg.preprocessing", \
-  repos = NULL, type = "source")'
+                                 repos = NULL, type = "source")'
 
-# Install federated summary package
+# Install federated survfit package
 COPY ./${PKG_NAME}/src /usr/local/R/${PKG_NAME}/
 
 WORKDIR /usr/local/R/${PKG_NAME}
-# Install R and necessary packages
-# Somehow prettyunit crashes when installed using the `install_deps`
-RUN R -e "remove.packages('prettyunits')"
-RUN R -e "install.packages('prettyunits', repos='http://cran.rstudio.com/')"
-
 RUN Rscript -e 'library(devtools)' -e 'pak::pak("iknl/vtg")'
+RUN Rscript -e 'install.packages("RCurl", repos = "http://cran.rstudio.com/")'
 # RUN Rscript -e 'devtools::install_deps(".")'
 RUN Rscript -e 'library(devtools)' -e 'pak::local_install_deps(".")'
 RUN Rscript -e 'install.packages(".", repos = NULL, type = "source", INSTALL_opts = "--no-multiarch")'
@@ -40,4 +34,3 @@ RUN touch database
 # Tell docker to execute `docker.wrapper()` when the image is run.
 ENV PKG_NAME=${PKG_NAME}
 CMD Rscript -e "vtg::docker.wrapper('$PKG_NAME')"
-
