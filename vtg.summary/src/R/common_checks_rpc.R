@@ -17,11 +17,6 @@ common_checks_rpc <- function(data, columns, types) {
     return(list("error" = msg))
   }
 
-  # Assign types
-  if (!is.null(types)) {
-    data <- vtg.preprocessing::assign_types(data, types)
-  }
-
   # check if all columns are either numeric or factors. If not, return error
   if (any(
     !sapply(data[, columns], function(col) is.numeric(col) || is.factor(col))

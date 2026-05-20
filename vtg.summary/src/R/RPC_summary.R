@@ -27,6 +27,9 @@ RPC_summary <- function(data, columns, types = NULL, subset_rules = NULL,
         data <- vtg.preprocessing::extend_data(data)
       }
       data <- vtg.preprocessing::subset_data(data, subset_rules)
+      data <- vtg.preprocessing::assign_types(data, types)
+      # TODO: assign factors after filtering as then we can filter on numeric
+      # values.
       data
     },
     error = function(e) {
@@ -43,7 +46,7 @@ RPC_summary <- function(data, columns, types = NULL, subset_rules = NULL,
   data <- vtg.preprocessing::factorize(data)
 
   # execute checks that are common to all RPCs
-  vtg::log$debug("Checking data & Apply types")
+  vtg::log$debug("Checking data")
   data <- vtg.summary::common_checks_rpc(data, columns, types)
   if ("error" %in% names(data)) {
     # Return error message

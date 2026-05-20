@@ -25,6 +25,7 @@ RPC_variance_sum <- function(data, columns, mean, types = NULL,
         data <- vtg.preprocessing::extend_data(data)
       }
       data <- vtg.preprocessing::subset_data(data, subset_rules)
+      data <- vtg.preprocessing::assign_types(data, types)
       data
     },
     error = function(e) {
