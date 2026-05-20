@@ -1,7 +1,7 @@
 # The Dockerfile tells Docker how to construct the image with your algorithm.
 # Once pushed to a repository, images can be downloaded and executed by the
 # network hubs.
-FROM docker.io/s102099/start-algorithm-base
+FROM ghcr.io/euracan/starter-algorithm-base:0.1.0
 
 # This is a placeholder that should be overloaded by invoking
 # docker build with '--build-arg PKG_NAME=...'
