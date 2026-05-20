@@ -5,6 +5,9 @@ on:
     tags:
       - '*/[0-9]+.[0-9]+.[0-9]+'
 
+permissions:
+  packages: write
+
 jobs:
     create-docker-image:
         runs-on: ubuntu-latest
@@ -27,7 +30,7 @@ jobs:
           run: echo "VERSION=$(echo $TAG | cut -d '/' -f 4)" >> $GITHUB_ENV
 
         - 
-          name: Login to Docker Hub
+          name: Login to Github Container Registry
           uses: docker/login-action@v4
           with:
             registry: ghcr.io
